@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BloxValues</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:#0b1020;color:#eef2ff}
+header{padding:28px 18px;background:linear-gradient(135deg,#111a35,#18244b);position:sticky;top:0;z-index:5;border-bottom:1px solid #2b3760}
+.wrap{max-width:1100px;margin:auto}.brand{font-size:32px;font-weight:900}.sub{color:#aab5d6;margin:5px 0 18px}
+input,select,button{border:1px solid #33416c;background:#121a32;color:#eef2ff;border-radius:10px;padding:11px 13px;font-size:14px}
+input{width:min(100%,430px)}button{cursor:pointer}.active{background:#3156d3;border-color:#5374e8}
+.controls{display:flex;gap:8px;flex-wrap:wrap}.stats{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}.stat{background:#111932;border:1px solid #26345d;padding:12px 16px;border-radius:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;padding:20px 0 40px}
+.card{background:#111932;border:1px solid #293762;border-radius:16px;padding:16px;box-shadow:0 8px 24px #0002}
+.icon{font-size:45px;height:55px}.name{font-size:19px;font-weight:800}.pill{display:inline-block;margin-top:5px;padding:4px 8px;border-radius:999px;background:#202c50;color:#b9c7f3;font-size:12px}
+.row{display:flex;justify-content:space-between;margin-top:14px}.label{color:#8f9bbb;font-size:12px}.value{font-weight:800}.bar{height:6px;background:#273253;border-radius:10px;margin-top:5px;overflow:hidden}.fill{height:100%;background:#6d8cff;border-radius:10px}
+section{padding:0 18px}.note{color:#8f9bbb;font-size:13px;padding-bottom:30px}.empty{text-align:center;padding:50px;color:#aab5d6}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+<div class="brand">🍇 BloxValues</div>
+<div class="sub">Fruit values • demand • rarity • type • Game Passes</div>
+<div class="controls">
+<input id="search" placeholder="Search a fruit...">
+<select id="type"><option value="All">All types</option><option>Natural</option><option>Elemental</option><option>Beast</option></select>
+<select id="rarity"><option value="All">All rarities</option><option>Common</option><option>Uncommon</option><option>Rare</option><option>Legendary</option><option>Mythical</option></select>
+<select id="sort"><option value="value">Sort: Value</option><option value="name">Sort: Name</option><option value="demand">Sort: Demand</option></select>
+<button id="fruits" class="active">🍎 Fruits</button><button id="passes">🎮 Game Passes</button>
+</div></div></header>
+<section><div class="wrap">
+<div class="stats"><div class="stat"><b id="count">42</b><br><span class="label">entries</span></div><div class="stat"><b>Sep 2026</b><br><span class="label">value dataset</span></div><div class="stat"><b>1–10</b><br><span class="label">demand scale</span></div></div>
+<div id="grid" class="grid"></div>
+<div class="note">Fan-made reference. Community trade values can change and are not official Roblox prices.</div>
+</div></section>
+<script>
+const fruits = [
+["🐉","Dragon (West)","Mythical","Beast",3.17e9,7],["🐲","Dragon (East)","Mythical","Beast",2.64e9,7],
+["🦊","Kitsune","Mythical","Beast",660e6,10],["🎛️","Control","Mythical","Natural",165e6,8],
+["🐅","Tiger","Mythical","Beast",130e6,7],["🥶","Yeti","Mythical","Beast",120e6,7],
+["🫧","Gas","Mythical","Elemental",65e6,6],["⚡","Lightning","Legendary","Elemental",40e6,6],
+["🍩","Dough","Mythical","Elemental",35e6,8],["🐍","Venom","Mythical","Natural",30e6,10],
+["🦖","T-Rex","Mythical","Beast",25e6,7],["🧘","Buddha","Legendary","Beast",15e6,9],
+["🕳️","Portal","Legendary","Natural",15e6,9],["🩸","Pain","Legendary","Natural",10e6,5],
+["🪐","Gravity","Mythical","Natural",10e6,5],["🦣","Mammoth","Mythical","Beast",10e6,4],
+["🕯️","Spirit","Mythical","Natural",10e6,7],["🌘","Shadow","Mythical","Natural",7e6,5],
+["❄️","Blizzard","Legendary","Elemental",6e6,3],["🔊","Sound","Legendary","Natural",3e6,4],
+["🐦","Phoenix","Legendary","Beast",3e6,4],["🌌","Creation","Legendary","Natural",2e6,3],
+["🕷️","Spider","Legendary","Natural",1.5e6,2],["💗","Love","Legendary","Natural",1.2e6,3],
+["💥","Quake","Legendary","Natural",1e6,2],["✨","Light","Rare","Elemental",900e3,4],
+["👻","Ghost","Rare","Natural",850e3,1],["💎","Diamond","Uncommon","Natural",800e3,1],
+["🎈","Rubber","Rare","Natural",780e3,1],["🦅","Eagle","Uncommon","Beast",600e3,2],
+["🧊","Ice","Uncommon","Elemental",500e3,3],["⏳","Sand","Uncommon","Elemental",500e3,2],
+["🌑","Dark","Uncommon","Elemental",500e3,2],["🔥","Flame","Uncommon","Elemental",280e3,1],
+["🌵","Spike","Common","Natural",180e3,1],["💨","Smoke","Common","Elemental",100e3,1],
+["💣","Bomb","Common","Natural",80e3,1],["🪀","Spring","Common","Natural",60e3,1],
+["🔪","Blade","Common","Natural",30e3,1],["🌀","Spin","Common","Natural",7500,1],
+["🚀","Rocket","Common","Natural",5000,1]
+];
+const passes=[
+["🔔","Fruit Notifier",2700,9],["⚔️","Dark Blade",1200,8],["💰","2x Money",450,8],
+["⭐","2x Mastery",450,8],["🚤","Fast Boats",350,7],["🎒","+1 Fruit Storage",400,9],
+["✨","2x Boss Drops",350,6],["🛡️","+1 Treasure Inventory",400,6],["🔄","Fast Mode",300,5]
+];
+function fmt(n){if(n>=1e9)return (n/1e9).toFixed(2).replace(/\.00$/,'')+"B";if(n>=1e6)return (n/1e6).toFixed(2).replace(/\.00$/,'')+"M";if(n>=1e3)return (n/1e3).toFixed(1).replace(/\.0$/,'')+"K";return n}
+let mode="fruits";
+function render(){
+ const q=document.getElementById("search").value.toLowerCase(), t=document.getElementById("type").value, r=document.getElementById("rarity").value;
+ const grid=document.getElementById("grid");
+ if(mode==="passes"){document.getElementById("count").textContent=passes.length;grid.innerHTML=passes.filter(x=>x[1].toLowerCase().includes(q)).map(x=>cardPass(x)).join("");return}
+ let a=fruits.filter(x=>x[1].toLowerCase().includes(q)&&(t==="All"||x[3]===t)&&(r==="All"||x[2]===r));
+ const s=document.getElementById("sort").value;
+ a.sort((x,y)=>s==="name"?x[1].localeCompare(y[1]):s==="demand"?y[5]-x[5]:y[4]-x[4]);
+ document.getElementById("count").textContent=a.length;grid.innerHTML=a.length?a.map(cardFruit).join(""):'<div class="empty">No matching fruits.</div>';
+}
+function cardFruit(x){return `<article class="card"><div class="icon">${x[0]}</div><div class="name">${x[1]}</div><span class="pill">${x[2]} • ${x[3]}</span><div class="row"><span class="label">Trade Value</span><span class="value">${fmt(x[4])}</span></div><div class="row"><span class="label">Demand</span><span class="value">${x[5]}/10</span></div><div class="bar"><div class="fill" style="width:${x[5]*10}%"></div></div></article>`}
+function cardPass(x){return `<article class="card"><div class="icon">${x[0]}</div><div class="name">${x[1]}</div><span class="pill">Game Pass</span><div class="row"><span class="label">Robux</span><span class="value">${x[2].toLocaleString()} R$</span></div><div class="row"><span class="label">Trade demand</span><span class="value">${x[3]}/10</span></div><div class="bar"><div class="fill" style="width:${x[3]*10}%"></div></div></article>`}
+document.querySelectorAll("input,select").forEach(e=>e.addEventListener("input",render));
+document.getElementById("fruits").onclick=()=>{mode="fruits";document.getElementById("fruits").classList.add("active");document.getElementById("passes").classList.remove("active");render()};
+document.getElementById("passes").onclick=()=>{mode="passes";document.getElementById("passes").classList.add("active");document.getElementById("fruits").classList.remove("active");render()};
+render();
+</script>
+</body></html>
